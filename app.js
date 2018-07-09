@@ -10,7 +10,12 @@ var express = require('express')
   , routes = require('./routes')
   , http = require('http')
   , path = require('path')
-  , pkg = require('./package.json');
+  , pkg = require('./package.json')
+  , favicon = require('serve-favicon')
+  , compression = require('compression')
+  , morgan = require('morgan')
+  , methodOverride = require('method-override')
+  , bodyParser = require('body-parser');
 
 
 env = {};
@@ -23,20 +28,15 @@ var app = express();
 
 // all environments
 
-app.use(express.favicon(path.join(__dirname, '/public/img/favicon.ico')));
-app.use(express.compress());
+app.use(favicon(path.join(__dirname, 'public/img', 'favicon.ico')));
+app.use(compression());
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
-app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.bodyParser());
-app.use(express.methodOverride());
-app.use(app.router);
+app.use(morgan('dev'));
+app.use(bodyParser.json());
 
 //caching header:
-var oneDay = 86400000;
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: oneDay }));
 
 // development only
 if ('development1' == app.get('env')) {
@@ -57,4 +57,6 @@ http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+var oneDay = 86400000;
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: oneDay }));
 
